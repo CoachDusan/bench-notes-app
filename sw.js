@@ -1,6 +1,6 @@
 /* Bench Notes offline cache.
    Bump CACHE when index.html changes so devices pick up the new version. */
-const CACHE = "bench-notes-v1";
+const CACHE = "bench-notes-a2b177cf7f";
 const CORE = ["./", "./index.html", "./manifest.webmanifest",
               "./icon-180.png", "./icon-192.png", "./icon-512.png"];
 
