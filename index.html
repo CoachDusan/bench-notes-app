@@ -1,0 +1,646 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Bench Notes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Courtside if/then observation notes.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Bench Notes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#141A1C">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
+
+<style>
+:root{
+  --ground:#141A1C; --surface:#1C2427; --surface-2:#232D31; --line:#2E3A3F; --line-soft:#252F33;
+  --ink:#E6E4DC; --ink-2:#B9BFBD; --muted:#8B9599; --faint:#5E696D;
+  --accent:#D99A2B; --accent-ink:#1A1206; --accent-soft:rgba(217,154,43,.14); --accent-line:rgba(217,154,43,.42);
+  --danger:#C4614B; --danger-soft:rgba(196,97,75,.16); --danger-line:rgba(196,97,75,.5);
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  --r:10px;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --ground:#EDEFEE; --surface:#FFFFFF; --surface-2:#F3F5F3; --line:#D3D9D7; --line-soft:#E2E7E5;
+    --ink:#1A2124; --ink-2:#3D474B; --muted:#63706F; --faint:#8B9895;
+    --accent:#9A6410; --accent-ink:#FFFFFF; --accent-soft:rgba(154,100,16,.10); --accent-line:rgba(154,100,16,.40);
+    --danger:#A8402C; --danger-soft:rgba(168,64,44,.10); --danger-line:rgba(168,64,44,.45);
+    --shadow:0 1px 2px rgba(26,33,36,.06), 0 8px 20px -14px rgba(26,33,36,.28);
+  }
+}
+:root[data-theme="light"]{
+  --ground:#EDEFEE; --surface:#FFFFFF; --surface-2:#F3F5F3; --line:#D3D9D7; --line-soft:#E2E7E5;
+  --ink:#1A2124; --ink-2:#3D474B; --muted:#63706F; --faint:#8B9895;
+  --accent:#9A6410; --accent-ink:#FFFFFF; --accent-soft:rgba(154,100,16,.10); --accent-line:rgba(154,100,16,.40);
+  --danger:#A8402C; --danger-soft:rgba(168,64,44,.10); --danger-line:rgba(168,64,44,.45);
+  --shadow:0 1px 2px rgba(26,33,36,.06), 0 8px 20px -14px rgba(26,33,36,.28);
+}
+
+*{box-sizing:border-box}
+html{background:var(--ground)}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:"Barlow Semi Condensed",ui-sans-serif,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  font-size:16px; line-height:1.4; -webkit-text-size-adjust:100%;
+  padding-bottom:calc(64px + env(safe-area-inset-bottom));
+}
+button,input,textarea{font:inherit; color:inherit}
+button{cursor:pointer; background:none; border:none}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{transition:none !important; animation:none !important}}
+
+.wrap{max-width:640px; margin:0 auto; padding:0 14px}
+
+.mast{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; padding:calc(18px + env(safe-area-inset-top)) 0 12px; border-bottom:1px solid var(--line)}
+.mast h1{margin:0; font-size:21px; font-weight:700; letter-spacing:.14em; text-transform:uppercase}
+.mast .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);align-self:center}
+.mast .sub{color:var(--faint); font-size:13px; letter-spacing:.06em; text-transform:uppercase; margin-left:auto}
+
+/* ---- alert banners ---- */
+#banners{display:flex; flex-direction:column; gap:8px; margin-top:12px}
+.banner{border-radius:var(--r); padding:12px 14px; border:1px solid var(--accent-line); background:var(--accent-soft)}
+.banner.stop{border-color:var(--danger-line); background:var(--danger-soft)}
+.banner h4{margin:0 0 5px; font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--accent)}
+.banner.stop h4{color:var(--danger)}
+.banner p{margin:0; font-size:14px; line-height:1.5; color:var(--ink-2)}
+.banner .acts{display:flex; gap:7px; margin-top:10px; flex-wrap:wrap}
+.banner .acts button{padding:8px 13px; border-radius:8px; border:1px solid var(--line); background:var(--surface); font-size:13px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--ink)}
+
+.rail{display:flex; gap:7px; overflow-x:auto; padding:12px 0; scrollbar-width:none; -webkit-overflow-scrolling:touch}
+.rail::-webkit-scrollbar{display:none}
+.pchip{flex:0 0 auto; display:flex; align-items:center; gap:7px; padding:9px 13px; border:1px solid var(--line); border-radius:var(--r); background:var(--surface); color:var(--ink-2); white-space:nowrap; font-weight:500; transition:background .12s, border-color .12s, color .12s}
+.pchip .num{font-size:12px; font-weight:700; color:var(--faint); font-variant-numeric:tabular-nums; min-width:16px; text-align:right}
+.pchip[aria-pressed="true"]{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+.pchip[aria-pressed="true"] .num{color:var(--accent-ink); opacity:.7}
+.pchip.add{color:var(--muted); border-style:dashed}
+
+.tabs{display:flex; gap:2px; background:var(--surface-2); border:1px solid var(--line); border-radius:var(--r); padding:3px; margin:2px 0 18px}
+.tabs button{flex:1; padding:9px 8px; border-radius:7px; font-weight:600; font-size:14px; letter-spacing:.09em; text-transform:uppercase; color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--surface); color:var(--ink); box-shadow:var(--shadow)}
+
+.eyebrow{font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--faint); display:block; margin-bottom:9px}
+.eyebrow .req{color:var(--accent); letter-spacing:0}
+.hint{font-size:13px; color:var(--muted); line-height:1.5}
+.block{margin-bottom:22px}
+
+.sitgrid{display:grid; grid-template-columns:1fr 1fr; gap:7px}
+@media (max-width:420px){.sitgrid{grid-template-columns:1fr}}
+.sit{position:relative; text-align:left; padding:11px 12px; min-height:52px; border:1px solid var(--line); border-radius:var(--r); background:var(--surface); color:var(--ink-2); font-size:14.5px; line-height:1.25; font-weight:500; display:flex; align-items:center; transition:background .12s, border-color .12s, color .12s}
+.sit[aria-pressed="true"]{background:var(--accent-soft); border-color:var(--accent); color:var(--ink)}
+.sit .tally{position:absolute; top:6px; right:8px; font-size:11px; font-weight:700; color:var(--faint); font-variant-numeric:tabular-nums}
+.sit[aria-pressed="true"] .tally{color:var(--accent)}
+.sit.general{grid-column:1/-1; border-style:dashed; color:var(--muted)}
+
+.then{width:100%; min-height:112px; resize:vertical; padding:13px 14px; background:var(--surface); border:1px solid var(--line); border-radius:var(--r); font-family:"Newsreader",Georgia,serif; font-size:17px; line-height:1.55}
+.then::placeholder{color:var(--faint); font-style:italic}
+.then:focus{border-color:var(--accent-line); outline:none}
+
+.ladder{display:flex; gap:7px}
+.conf{flex:1; padding:10px 6px; border-radius:var(--r); background:var(--surface); border:1px solid var(--line); color:var(--muted); display:flex; flex-direction:column; align-items:center; gap:6px; font-size:12.5px; font-weight:600; letter-spacing:.04em; text-align:center; line-height:1.2}
+.mark{width:13px; height:13px; border-radius:50%; border:2px solid var(--faint)}
+.conf[data-lvl="2"] .mark{background:var(--faint); border-color:var(--faint)}
+.conf[data-lvl="0"] .mark{border-style:dashed}
+.conf[aria-pressed="true"]{border-color:var(--accent); background:var(--accent-soft); color:var(--ink)}
+.conf[aria-pressed="true"] .mark{border-color:var(--accent)}
+.conf[data-lvl="2"][aria-pressed="true"] .mark{background:var(--accent)}
+
+.save{width:100%; padding:15px; border-radius:var(--r); background:var(--accent); color:var(--accent-ink); font-weight:700; font-size:16px; letter-spacing:.1em; text-transform:uppercase; transition:opacity .12s}
+.save:disabled{opacity:.34; cursor:not-allowed}
+.ghost{padding:11px 15px; border:1px solid var(--line); border-radius:var(--r); background:var(--surface); color:var(--ink-2); font-weight:600; font-size:14px; letter-spacing:.06em; text-transform:uppercase}
+.ghost.wide{width:100%; display:block; text-align:center; margin-bottom:8px}
+.row{display:flex; gap:8px}
+.row>*{flex:1}
+
+.grp{margin-bottom:24px}
+.grp-h{display:flex; align-items:baseline; gap:9px; padding-bottom:7px; border-bottom:1px solid var(--accent-line); margin-bottom:11px}
+.grp-h .when{font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--accent)}
+.grp-h .label{font-size:16px; font-weight:600; color:var(--ink); line-height:1.25}
+.note{background:var(--surface); border:1px solid var(--line-soft); border-left:2px solid var(--accent-line); border-radius:0 var(--r) var(--r) 0; padding:11px 13px; margin-bottom:8px}
+.note.assume{border-left-style:dashed}
+.note-meta{display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:11.5px; letter-spacing:.09em; text-transform:uppercase; color:var(--faint); font-variant-numeric:tabular-nums}
+.note-meta .mark{width:9px;height:9px;border-width:1.5px;border-color:var(--muted)}
+.note-meta .acts{margin-left:auto; display:flex; gap:2px}
+.note-meta .acts button{padding:3px 7px; font-size:11px; letter-spacing:.09em; text-transform:uppercase; color:var(--faint); border-radius:5px}
+.note-meta .acts .del:hover{color:var(--danger)}
+.note-body{font-family:"Newsreader",Georgia,serif; font-size:17px; line-height:1.55; color:var(--ink); white-space:pre-wrap; word-wrap:break-word}
+
+.gap{border:1px dashed var(--line); border-radius:var(--r); padding:13px 14px}
+.gap ul{margin:9px 0 0; padding-left:17px; color:var(--muted); font-size:14.5px; line-height:1.6}
+
+.empty{text-align:center; padding:40px 18px; color:var(--muted)}
+.empty p{margin:0 0 6px; font-size:15px}
+.empty .big{font-family:"Newsreader",Georgia,serif; font-size:19px; color:var(--ink-2); font-style:italic; margin-bottom:12px}
+
+.rline{display:flex; align-items:center; gap:11px; padding:11px 13px; background:var(--surface); border:1px solid var(--line-soft); border-radius:var(--r); margin-bottom:7px}
+.rline .num{font-size:15px; font-weight:700; color:var(--accent); font-variant-numeric:tabular-nums; min-width:26px}
+.rline .nm{flex:1; font-weight:600; font-size:16px}
+.rline .ct{font-size:12px; color:var(--faint); letter-spacing:.06em; text-transform:uppercase; font-variant-numeric:tabular-nums}
+.rline button{padding:5px 8px; font-size:11px; letter-spacing:.09em; text-transform:uppercase; color:var(--faint); border-radius:5px}
+.rline .del:hover{color:var(--danger)}
+.field{width:100%; padding:12px 13px; background:var(--surface); border:1px solid var(--line); border-radius:var(--r); font-size:16px}
+.field:focus{border-color:var(--accent-line); outline:none}
+.addrow{display:flex; gap:7px; margin-bottom:9px}
+.addrow .field.n{flex:0 0 72px}
+.addrow .field.p{flex:1}
+.addrow .go{flex:0 0 auto; padding:12px 17px; background:var(--accent); color:var(--accent-ink); border-radius:var(--r); font-weight:700; letter-spacing:.08em; text-transform:uppercase; font-size:14px}
+
+.privacy{margin-top:26px; padding:15px; border:1px solid var(--line-soft); border-radius:var(--r); background:var(--surface-2)}
+.privacy h3{margin:0 0 7px; font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--faint)}
+.privacy p{margin:0 0 8px; font-size:13.5px; color:var(--muted); line-height:1.55}
+.privacy p:last-child{margin:0}
+.privacy .state{color:var(--ink-2); font-weight:600}
+
+.toast{position:fixed; left:50%; bottom:22px; transform:translate(-50%,14px); background:var(--ink); color:var(--ground); padding:11px 19px; border-radius:var(--r); font-weight:600; font-size:14px; letter-spacing:.06em; text-transform:uppercase; opacity:0; pointer-events:none; transition:opacity .18s, transform .18s; z-index:50; box-shadow:var(--shadow)}
+.toast.on{opacity:1; transform:translate(-50%,0)}
+.hidden{display:none !important}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="mast">
+    <span class="dot"></span>
+    <h1>Bench Notes</h1>
+    <span class="sub" id="stamp"></span>
+  </header>
+
+  <div id="banners"></div>
+
+  <nav class="rail" id="rail" aria-label="Players"></nav>
+
+  <div class="tabs" role="tablist" id="tabs">
+    <button role="tab" id="t-note" aria-selected="true">Note</button>
+    <button role="tab" id="t-read" aria-selected="false">All notes</button>
+    <button role="tab" id="t-roster" aria-selected="false">Roster</button>
+  </div>
+
+  <section id="v-note">
+    <div class="block">
+      <span class="eyebrow">When <span class="req">&mdash; required</span></span>
+      <div class="sitgrid" id="sitgrid"></div>
+    </div>
+    <div class="block">
+      <span class="eyebrow">Then he <span class="req">&mdash; required</span></span>
+      <textarea class="then" id="then" placeholder="Only what a camera would have recorded."></textarea>
+      <p class="hint" style="margin:7px 0 0">Behaviour, not character. &ldquo;Drops his head, stops talking for two possessions&rdquo; &mdash; not &ldquo;mentally weak&rdquo;.</p>
+    </div>
+    <div class="block">
+      <span class="eyebrow">How sure are you</span>
+      <div class="ladder" id="ladder">
+        <button class="conf" data-lvl="2" aria-pressed="false"><span class="mark"></span>Seen several times</button>
+        <button class="conf" data-lvl="1" aria-pressed="false"><span class="mark"></span>Seen once</button>
+        <button class="conf" data-lvl="0" aria-pressed="false"><span class="mark"></span>I assume</button>
+      </div>
+    </div>
+    <button class="save" id="save" disabled>Save note</button>
+    <button class="ghost wide hidden" id="cancel" style="margin-top:8px">Cancel edit</button>
+  </section>
+
+  <section id="v-read" class="hidden"></section>
+
+  <section id="v-roster" class="hidden">
+    <div class="block">
+      <span class="eyebrow">Add a player</span>
+      <div class="addrow">
+        <input class="field n" id="a-num" inputmode="numeric" placeholder="#" aria-label="Number">
+        <input class="field p" id="a-name" placeholder="Name" aria-label="Name">
+        <button class="go" id="a-go">Add</button>
+      </div>
+    </div>
+    <div class="block" id="rlist"></div>
+
+    <div class="block">
+      <span class="eyebrow">Backup</span>
+      <button class="ghost wide" id="backup">Save a backup file</button>
+      <button class="ghost wide" id="restore-btn">Restore from a backup file</button>
+      <button class="ghost wide" id="copy-all">Copy every note as text</button>
+      <input type="file" id="restore-file" accept="application/json,.json" class="hidden">
+      <p class="hint" id="backup-state"></p>
+    </div>
+
+    <div class="privacy">
+      <h3>Where this lives</h3>
+      <p class="state" id="storage-state"></p>
+      <p>Your notes are stored by the browser on this device. They are never sent anywhere, and no one else can read them &mdash; not even from another one of your devices.</p>
+      <p>That also means the browser can throw them away: clearing website data, or leaving the app untouched for a long stretch, can wipe them. <strong>Save a backup file</strong> after any session that mattered. It goes to your Files app and it is the only copy that a browser cannot delete.</p>
+      <p>These are personal assessments of people you work with. If you would not be comfortable with the player reading his page, rewrite the line as observed behaviour until you would be.</p>
+    </div>
+  </section>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+"use strict";
+const KEY="benchnotes.v1", GUARD="benchnotes.guard", CACHE_PREFIX="bench-notes";
+const SITS=[
+ "Right after his own mistake",
+ "After a call goes against him",
+ "Last 3 minutes, game within 5",
+ "Down double digits, on the road",
+ "Subbed off straight after a mistake",
+ "Hasn't touched the ball in 4-5 possessions",
+ "Deep fatigue — late in a game, or 2nd of a back-to-back",
+ "Crowd or bench is on him",
+ "Corrected in front of the group",
+ "Team is winning comfortably"
+];
+const GENERAL="general";
+const CONF=["I assume — unverified","Seen once","Seen several times"];
+const WEEK=7*86400000;
+
+let db={players:[],notes:[]}, sel=null, tab="note";
+let draft={sit:null, conf:null, editing:null};
+let storageOK=true, alerts=[];
+
+/* ---- storage ---- */
+function probeStorage(){
+  try{
+    localStorage.setItem("__probe__","1");
+    const v=localStorage.getItem("__probe__");
+    localStorage.removeItem("__probe__");
+    return v==="1";
+  }catch(e){ return false; }
+}
+function load(){
+  try{
+    const raw=localStorage.getItem(KEY);
+    if(raw){const p=JSON.parse(raw); if(p&&Array.isArray(p.players)&&Array.isArray(p.notes)) db=p;}
+  }catch(e){}
+}
+function save(){
+  if(!storageOK){ toast("NOT SAVED — storage is blocked"); return false; }
+  try{
+    localStorage.setItem(KEY,JSON.stringify(db));
+    const g=readGuard()||{runs:0}; g.notesSeen=db.notes.length; g.lastRun=Date.now(); writeGuard(g);
+    return true;
+  }catch(e){
+    storageOK=false; drawBanners(); toast("NOT SAVED — storage is full or blocked"); return false;
+  }
+}
+function readGuard(){ try{ return JSON.parse(localStorage.getItem(GUARD)||"null"); }catch(e){ return null; } }
+function writeGuard(g){ try{ localStorage.setItem(GUARD,JSON.stringify(g)); }catch(e){} }
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+
+/* ---- storage guard: prove persistence, shout when it fails ---- */
+async function runGuard(){
+  storageOK=probeStorage();
+  alerts=[];
+  if(window.self!==window.top){
+    alerts.push({stop:true,h:"Wrong window",
+      p:"This app is running inside another page, where the browser refuses to keep your notes. Open it at its own address instead, or your notes will disappear."});
+  }
+  if(!storageOK){
+    alerts.push({stop:true,h:"Notes cannot be saved",
+      p:"This browser is blocking storage — usually Private Browsing. Anything you type here will be lost. Open the app in a normal (non-private) window."});
+    drawBanners(); return;
+  }
+  const before=readGuard();
+  let hadCache=false;
+  try{
+    if(window.caches){
+      const keys=await caches.keys();
+      hadCache=keys.some(k=>k.indexOf(CACHE_PREFIX)===0);
+    }
+  }catch(e){}
+  const wiped = (before && before.notesSeen>0 && db.notes.length===0) || (!before && hadCache);
+  if(wiped){
+    alerts.push({stop:true,h:"Your notes were cleared",
+      p:"The browser deleted this app's saved notes. If you have a backup file, restore it from the Roster tab. Save a backup after every session from now on.",
+      act:{label:"Restore a backup",fn:()=>{setTab("roster"); document.getElementById("restore-file").click();}}});
+  }
+  const g=before||{runs:0,firstRun:Date.now(),lastBackup:null,notesSeen:0};
+  g.runs=(g.runs||0)+1; g.lastRun=Date.now(); g.notesSeen=db.notes.length;
+  writeGuard(g);
+  if(db.notes.length>0){
+    const since=g.lastBackup?Date.now()-g.lastBackup:null;
+    if(since===null || since>WEEK){
+      alerts.push({h:"No backup yet",
+        p:since===null
+          ? "You have "+db.notes.length+" note"+(db.notes.length===1?"":"s")+" and no backup file. A browser can wipe this at any time."
+          : "Your last backup was "+Math.floor(since/86400000)+" days ago.",
+        act:{label:"Save a backup now",fn:()=>{setTab("roster"); doBackup();}}});
+    }
+  }
+  try{
+    if(navigator.storage&&navigator.storage.persist&&!(await navigator.storage.persisted())) await navigator.storage.persist();
+  }catch(e){}
+  drawBanners();
+}
+function drawBanners(){
+  const box=document.getElementById("banners");
+  box.textContent="";
+  alerts.forEach(a=>{
+    const d=document.createElement("div"); d.className="banner"+(a.stop?" stop":"");
+    const h=document.createElement("h4"); h.textContent=a.h;
+    const p=document.createElement("p"); p.textContent=a.p;
+    d.append(h,p);
+    if(a.act){
+      const w=document.createElement("div"); w.className="acts";
+      const b=document.createElement("button"); b.textContent=a.act.label; b.onclick=a.act.fn;
+      w.appendChild(b); d.appendChild(w);
+    }
+    box.appendChild(d);
+  });
+}
+
+/* ---- helpers ---- */
+function fmt(ts){const d=new Date(ts),p=n=>String(n).padStart(2,"0");return p(d.getDate())+"."+p(d.getMonth()+1)+"."+d.getFullYear();}
+function player(id){return db.players.find(p=>p.id===id)||null;}
+function notesOf(id){return db.notes.filter(n=>n.playerId===id).sort((a,b)=>b.ts-a.ts);}
+function sitLabel(s){return s===GENERAL?"General":(SITS[s]||"General");}
+let tTimer;
+function toast(msg){
+  const el=document.getElementById("toast");
+  el.textContent=msg; el.classList.add("on");
+  clearTimeout(tTimer); tTimer=setTimeout(()=>el.classList.remove("on"),2200);
+}
+async function copy(text,label){
+  try{ await navigator.clipboard.writeText(text); toast(label); }
+  catch(e){
+    const ta=document.createElement("textarea");
+    ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
+    document.body.appendChild(ta); ta.select();
+    try{document.execCommand("copy"); toast(label);}catch(e2){toast("Copy blocked — select the text by hand");}
+    ta.remove();
+  }
+}
+
+/* ---- backup / restore ---- */
+function backupName(){
+  const d=new Date(),p=n=>String(n).padStart(2,"0");
+  return "bench-notes-"+d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+".json";
+}
+function doBackup(){
+  const payload=JSON.stringify({app:"bench-notes",version:1,savedAt:Date.now(),data:db},null,2);
+  try{
+    const blob=new Blob([payload],{type:"application/json"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a"); a.href=url; a.download=backupName();
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),4000);
+    const g=readGuard()||{runs:1}; g.lastBackup=Date.now(); writeGuard(g);
+    alerts=alerts.filter(x=>x.h!=="No backup yet"); drawBanners();
+    render(); toast("Backup saved");
+  }catch(e){ copy(payload,"Download blocked — backup copied instead"); }
+}
+function doRestore(file){
+  const rd=new FileReader();
+  rd.onload=()=>{
+    let p;
+    try{ p=JSON.parse(rd.result); }catch(e){ toast("Not a backup file"); return; }
+    const d=(p&&p.data)?p.data:p;
+    if(!d||!Array.isArray(d.players)||!Array.isArray(d.notes)){ toast("Not a Bench Notes backup"); return; }
+    if(!confirm("Restore "+d.players.length+" players and "+d.notes.length+" notes?\n\nThis replaces everything currently in the app.")) return;
+    db=d; sel=db.players.length?db.players[0].id:null;
+    alerts=alerts.filter(x=>x.h!=="Your notes were cleared");
+    if(save()){ drawBanners(); render(); toast("Restored "+d.notes.length+" notes"); }
+  };
+  rd.onerror=()=>toast("Could not read that file");
+  rd.readAsText(file);
+}
+
+/* ---- render ---- */
+function drawRail(){
+  const rail=document.getElementById("rail"); rail.textContent="";
+  db.players.forEach(p=>{
+    const b=document.createElement("button");
+    b.className="pchip"; b.setAttribute("aria-pressed",String(p.id===sel));
+    if(p.number){const s=document.createElement("span"); s.className="num"; s.textContent=p.number; b.appendChild(s);}
+    b.appendChild(document.createTextNode(p.name));
+    b.onclick=()=>{sel=p.id; resetDraft(); render();};
+    rail.appendChild(b);
+  });
+  const add=document.createElement("button");
+  add.className="pchip add"; add.textContent=db.players.length?"+ Player":"+ Add your first player";
+  add.onclick=()=>{setTab("roster"); setTimeout(()=>document.getElementById("a-num").focus(),40);};
+  rail.appendChild(add);
+}
+function drawCapture(){
+  const grid=document.getElementById("sitgrid"); grid.textContent="";
+  const mine=sel?notesOf(sel):[];
+  const mk=(val,label,extra)=>{
+    const b=document.createElement("button");
+    b.className="sit"+(extra||""); b.setAttribute("aria-pressed",String(draft.sit===val));
+    b.appendChild(document.createTextNode(label));
+    const n=mine.filter(x=>x.sit===val).length;
+    if(n){const t=document.createElement("span"); t.className="tally"; t.textContent=n; b.appendChild(t);}
+    b.onclick=()=>{draft.sit=(draft.sit===val?null:val); drawCapture(); syncSave();};
+    grid.appendChild(b);
+  };
+  SITS.forEach((s,i)=>mk(i,s));
+  mk(GENERAL,"Something else — general note"," general");
+  document.querySelectorAll("#ladder .conf").forEach(b=>{
+    b.setAttribute("aria-pressed",String(draft.conf===Number(b.dataset.lvl)));
+    b.onclick=()=>{const v=Number(b.dataset.lvl); draft.conf=(draft.conf===v?null:v); drawCapture(); syncSave();};
+  });
+  document.getElementById("cancel").classList.toggle("hidden",!draft.editing);
+  document.getElementById("save").textContent=draft.editing?"Update note":"Save note";
+  syncSave();
+}
+function syncSave(){
+  const ok=!!sel && draft.sit!==null && document.getElementById("then").value.trim().length>0;
+  document.getElementById("save").disabled=!ok;
+}
+function resetDraft(){ draft={sit:null,conf:null,editing:null}; document.getElementById("then").value=""; }
+
+function drawRead(){
+  const v=document.getElementById("v-read"); v.textContent="";
+  const p=player(sel);
+  if(!p){v.appendChild(emptyState("No player selected.","Pick a name above, or add one in Roster.")); return;}
+  const mine=notesOf(sel);
+  if(!mine.length){v.appendChild(emptyState("Nothing written down for "+p.name+" yet.","Every profile starts empty. That is the honest state.")); return;}
+  const bar=document.createElement("div"); bar.className="row"; bar.style.marginBottom="20px";
+  const c=document.createElement("button"); c.className="ghost"; c.textContent="Copy "+p.name+"'s notes";
+  c.onclick=()=>copy(exportPlayer(p),"Copied — "+mine.length+" notes");
+  bar.appendChild(c); v.appendChild(bar);
+  const order=[...SITS.keys(),GENERAL];
+  order.forEach(s=>{
+    const set=mine.filter(n=>n.sit===s);
+    if(!set.length) return;
+    const g=document.createElement("div"); g.className="grp";
+    const h=document.createElement("div"); h.className="grp-h";
+    const w=document.createElement("span"); w.className="when"; w.textContent="When";
+    const l=document.createElement("span"); l.className="label"; l.textContent=sitLabel(s);
+    h.append(w,l); g.appendChild(h);
+    set.forEach(n=>g.appendChild(noteCard(n)));
+    v.appendChild(g);
+  });
+  const gaps=SITS.filter((_,i)=>!mine.some(n=>n.sit===i));
+  if(gaps.length){
+    const box=document.createElement("div"); box.className="gap";
+    const e=document.createElement("span"); e.className="eyebrow"; e.textContent="Not yet observed";
+    const hint=document.createElement("p"); hint.className="hint"; hint.style.margin="0";
+    hint.textContent="The empty cells are the useful list — these are the situations you have not seen him in.";
+    const ul=document.createElement("ul");
+    gaps.forEach(s=>{const li=document.createElement("li"); li.textContent=s; ul.appendChild(li);});
+    box.append(e,hint,ul); v.appendChild(box);
+  }
+}
+function noteCard(n){
+  const d=document.createElement("div"); d.className="note"+(n.conf===0?" assume":"");
+  const m=document.createElement("div"); m.className="note-meta";
+  const mk=document.createElement("span"); mk.className="mark";
+  if(n.conf===2){mk.style.background="var(--muted)"; mk.style.borderColor="var(--muted)";}
+  if(n.conf===0||n.conf===null||n.conf===undefined) mk.style.borderStyle="dashed";
+  m.appendChild(mk);
+  const t=document.createElement("span");
+  t.textContent=fmt(n.ts)+(n.conf===null||n.conf===undefined?"":" · "+CONF[n.conf]);
+  m.appendChild(t);
+  const acts=document.createElement("span"); acts.className="acts";
+  const ed=document.createElement("button"); ed.textContent="Edit";
+  ed.onclick=()=>{
+    draft={sit:n.sit,conf:(n.conf===null||n.conf===undefined?null:n.conf),editing:n.id};
+    document.getElementById("then").value=n.text;
+    setTab("note"); window.scrollTo({top:0,behavior:"smooth"});
+  };
+  const del=document.createElement("button"); del.className="del"; del.textContent="Delete";
+  del.onclick=()=>{
+    if(!confirm("Delete this note? It cannot be undone.")) return;
+    db.notes=db.notes.filter(x=>x.id!==n.id); save(); render(); toast("Deleted");
+  };
+  acts.append(ed,del); m.appendChild(acts);
+  const b=document.createElement("div"); b.className="note-body"; b.textContent=n.text;
+  d.append(m,b); return d;
+}
+function emptyState(big,small){
+  const e=document.createElement("div"); e.className="empty";
+  const a=document.createElement("p"); a.className="big"; a.textContent=big;
+  const b=document.createElement("p"); b.textContent=small;
+  e.append(a,b); return e;
+}
+function drawRoster(){
+  const list=document.getElementById("rlist"); list.textContent="";
+  if(db.players.length){
+    const e=document.createElement("span"); e.className="eyebrow"; e.textContent="Roster — "+db.players.length;
+    list.appendChild(e);
+    db.players.forEach(p=>{
+      const r=document.createElement("div"); r.className="rline";
+      const n=document.createElement("span"); n.className="num"; n.textContent=p.number||"–";
+      const nm=document.createElement("span"); nm.className="nm"; nm.textContent=p.name;
+      const ct=document.createElement("span"); ct.className="ct";
+      const k=notesOf(p.id).length; ct.textContent=k+(k===1?" note":" notes");
+      const ren=document.createElement("button"); ren.textContent="Rename";
+      ren.onclick=()=>{const v=prompt("Name",p.name); if(v===null)return; const t=v.trim(); if(!t)return; p.name=t; save(); render();};
+      const del=document.createElement("button"); del.className="del"; del.textContent="Remove";
+      del.onclick=()=>{
+        const k2=notesOf(p.id).length;
+        if(!confirm("Remove "+p.name+(k2?" and delete "+k2+" note"+(k2===1?"":"s"):"")+"? This cannot be undone.")) return;
+        db.players=db.players.filter(x=>x.id!==p.id);
+        db.notes=db.notes.filter(x=>x.playerId!==p.id);
+        if(sel===p.id) sel=db.players.length?db.players[0].id:null;
+        save(); render(); toast("Removed");
+      };
+      r.append(n,nm,ct,ren,del); list.appendChild(r);
+    });
+  }else{
+    list.appendChild(emptyState("No players yet.","Add a name above to start."));
+  }
+  const g=readGuard();
+  document.getElementById("backup-state").textContent =
+    (g&&g.lastBackup) ? "Last backup: "+fmt(g.lastBackup) : "You have never saved a backup file.";
+  document.getElementById("storage-state").textContent =
+    storageOK ? "Storage is working on this device." : "Storage is BLOCKED — nothing you type will be kept.";
+}
+
+/* ---- export ---- */
+function exportPlayer(p){
+  const mine=notesOf(p.id), L=[];
+  L.push("BENCH NOTES — "+p.name.toUpperCase()+(p.number?"  #"+p.number:""));
+  L.push(mine.length+(mine.length===1?" note":" notes")+"  ·  pulled "+fmt(Date.now()));
+  L.push("");
+  [...SITS.keys(),GENERAL].forEach(s=>{
+    const set=mine.filter(n=>n.sit===s);
+    if(!set.length) return;
+    L.push("WHEN: "+sitLabel(s));
+    set.forEach(n=>{
+      L.push("  "+fmt(n.ts)+(n.conf===null||n.conf===undefined?"":"  ·  "+CONF[n.conf]));
+      n.text.split("\n").forEach(line=>L.push("  "+line));
+      L.push("");
+    });
+  });
+  const gaps=SITS.filter((_,i)=>!mine.some(n=>n.sit===i));
+  if(gaps.length){ L.push("NOT YET OBSERVED"); gaps.forEach(g=>L.push("  — "+g)); L.push(""); }
+  return L.join("\n").trim()+"\n";
+}
+function exportAll(){
+  if(!db.players.length) return "BENCH NOTES — empty roster\n";
+  return "BENCH NOTES — FULL BACKUP\n"+fmt(Date.now())+"  ·  "+db.players.length+" players  ·  "+db.notes.length+" notes\n\n"
+    + db.players.map(exportPlayer).join("\n"+"─".repeat(40)+"\n\n");
+}
+
+/* ---- tabs ---- */
+function setTab(t){
+  tab=t;
+  document.getElementById("t-note").setAttribute("aria-selected",String(t==="note"));
+  document.getElementById("t-read").setAttribute("aria-selected",String(t==="read"));
+  document.getElementById("t-roster").setAttribute("aria-selected",String(t==="roster"));
+  document.getElementById("v-note").classList.toggle("hidden",t!=="note");
+  document.getElementById("v-read").classList.toggle("hidden",t!=="read");
+  document.getElementById("v-roster").classList.toggle("hidden",t!=="roster");
+  render();
+}
+function render(){
+  drawRail();
+  document.getElementById("stamp").textContent = db.notes.length ? db.players.length+" players · "+db.notes.length+" notes" : "";
+  if(tab==="note") drawCapture(); else if(tab==="read") drawRead(); else drawRoster();
+}
+
+/* ---- wire up ---- */
+document.getElementById("t-note").onclick=()=>setTab("note");
+document.getElementById("t-read").onclick=()=>setTab("read");
+document.getElementById("t-roster").onclick=()=>setTab("roster");
+document.getElementById("then").addEventListener("input",syncSave);
+document.getElementById("save").onclick=()=>{
+  const text=document.getElementById("then").value.trim();
+  if(!sel||draft.sit===null||!text) return;
+  if(draft.editing){
+    const n=db.notes.find(x=>x.id===draft.editing);
+    if(n){n.sit=draft.sit; n.conf=draft.conf; n.text=text;}
+    resetDraft(); save(); setTab("read"); toast("Updated");
+  }else{
+    db.notes.push({id:uid(),playerId:sel,sit:draft.sit,conf:draft.conf,text,ts:Date.now()});
+    resetDraft(); save(); render(); toast("Saved");
+  }
+};
+document.getElementById("cancel").onclick=()=>{resetDraft(); render();};
+function addPlayer(){
+  const num=document.getElementById("a-num").value.trim();
+  const name=document.getElementById("a-name").value.trim();
+  if(!name){toast("Give the player a name"); document.getElementById("a-name").focus(); return;}
+  const p={id:uid(),name,number:num};
+  db.players.push(p); if(!sel) sel=p.id;
+  document.getElementById("a-num").value=""; document.getElementById("a-name").value="";
+  save(); render(); document.getElementById("a-num").focus();
+}
+document.getElementById("a-go").onclick=addPlayer;
+document.getElementById("a-name").addEventListener("keydown",e=>{if(e.key==="Enter")addPlayer();});
+document.getElementById("a-num").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("a-name").focus();});
+document.getElementById("copy-all").onclick=()=>copy(exportAll(),"Copied — whole roster");
+document.getElementById("backup").onclick=doBackup;
+document.getElementById("restore-btn").onclick=()=>document.getElementById("restore-file").click();
+document.getElementById("restore-file").addEventListener("change",function(e){
+  const f=e.target.files&&e.target.files[0];
+  if(f) doRestore(f);
+  e.target.value="";
+});
+
+storageOK=probeStorage();
+load();
+if(db.players.length) sel=db.players[0].id;
+if(!db.players.length) tab="roster";
+setTab(tab);
+runGuard();
+
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
+</script>
+</body>
+</html>
