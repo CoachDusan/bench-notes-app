@@ -15,7 +15,15 @@ self.addEventListener("install", e => {
 self.addEventListener("activate", e => {
   e.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      /* Only this app's own old caches. Every one of these apps is served from
+         coachdusan.github.io, and cache storage belongs to the whole origin,
+         not to a folder — so "delete everything that isn't mine" threw away
+         Paint Touches' and Practise Organiser's offline copies, leaving them
+         unable to open without signal. Notes were never at risk; the offline
+         copies were. */
+      .then(keys => Promise.all(
+        keys.filter(k => k.startsWith("bench-notes-") && k !== CACHE).map(k => caches.delete(k))
+      ))
       .then(() => self.clients.claim())
   );
 });
